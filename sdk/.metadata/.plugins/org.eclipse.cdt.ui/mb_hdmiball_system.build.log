@@ -1,0 +1,8 @@
+17:03:08 **** Clean-only build of configuration Debug for project mb_hdmiball_system ****
+make clean 
+rm -rf ./_sds
+rm -rf package
+rm -f system.bif
+
+17:03:08 Build Finished (took 177ms)
+

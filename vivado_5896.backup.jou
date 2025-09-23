@@ -1,0 +1,63 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Mon May  5 16:35:30 2025
+# Process ID: 5896
+# Current directory: C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent4224 C:\Users\srira\OneDrive\Desktop\ECE385\ECE385-sanjits2_mzwu3\lab6_2_restart\lab6_2_restart.xpr
+# Log file: C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart/vivado.log
+# Journal file: C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart\vivado.jou
+# Running On: LAPTOP-6S4JKNP9, OS: Windows, CPU Frequency: 2918 MHz, CPU Physical cores: 14, Host memory: 16857 MB
+#-----------------------------------------------------------
+start_gui
+open_project C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart/lab6_2_restart.xpr
+update_compile_order -fileset sources_1
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top tb_poly_note_pwm [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode All [current_project]
+update_compile_order -fileset sim_1
+launch_simulation
+source tb_poly_note_pwm.tcl
+run 100 us
+current_wave_config {Untitled 1}
+add_wave {{/tb_poly_note_pwm/pwm}} 
+relaunch_sim
+relaunch_sim
+relaunch_sim
+set_property source_mgmt_mode DisplayOnly [current_project]
+close_sim
+launch_simulation
+source tb_poly_note_pwm.tcl
+run 100 us
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top mb_usb_hdmi_top [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top tb_looper_pwm [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+launch_simulation
+launch_simulation
+launch_simulation
+launch_simulation
+launch_simulation -mode post-synthesis -type functional
+launch_simulation
+relaunch_sim
+launch_simulation
+source tb_looper_pwm.tcl
+run 400 us
+relaunch_sim
+save_wave_config {C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart/tb_looper_pwm_behav.wcfg}
+add_files -fileset sim_1 -norecurse C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart/tb_looper_pwm_behav.wcfg
+set_property xsim.view C:/Users/srira/OneDrive/Desktop/ECE385/ECE385-sanjits2_mzwu3/lab6_2_restart/tb_looper_pwm_behav.wcfg [get_filesets sim_1]
+close_sim
+close_sim

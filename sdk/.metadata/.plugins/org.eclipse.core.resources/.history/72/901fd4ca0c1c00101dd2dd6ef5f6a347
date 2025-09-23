@@ -1,0 +1,184 @@
+/******************************************************************************
+ * main.c
+ * USB‑Host + PWM audio demo on MicroBlaze
+ ******************************************************************************/
+
+#include <stdio.h>
+#include "platform.h"
+
+#include "lw_usb/GenericMacros.h"
+#include "lw_usb/GenericTypeDefs.h"
+#include "lw_usb/MAX3421E.h"
+#include "lw_usb/USB.h"
+#include "lw_usb/usb_ch9.h"
+#include "lw_usb/transfer.h"
+#include "lw_usb/HID.h"
+
+#include "xparameters.h"
+#include "xil_io.h"
+#include "xgpio.h"
+
+/*** PWM IP definitions ***/
+#define PWM_BASEADDR   XPAR_AXI_PWM_0_BASEADDR
+static const uint32_t PWM_PERIOD = 1000;  // 100 MHz AXI clk / 1 000 = 100 kHz PWM carrier
+
+static void PWM_EnableChannel(uint8_t ch) {
+    Xil_Out32(PWM_BASEADDR + 16*ch + 0x00, 1);
+}
+
+static void PWM_DisableChannel(uint8_t ch) {
+    Xil_Out32(PWM_BASEADDR + 16*ch + 0x00, 0);
+}
+
+static void PWM_ConfigureChannel(uint8_t ch, uint32_t period, uint32_t pulse) {
+    if (pulse > period) {
+        pulse = period;  // clamp
+    }
+    Xil_Out32(PWM_BASEADDR + 16*ch + 0x04, period);
+    Xil_Out32(PWM_BASEADDR + 16*ch + 0x08, pulse);
+}
+
+/*** Existing USB/HID demo code ***/
+extern HID_DEVICE hid_device;
+static XGpio Gpio_hex;
+
+/* debug helper: flash hex display */
+void printHex(u32 data, unsigned channel) {
+    XGpio_DiscreteWrite(&Gpio_hex, channel, data);
+}
+
+/* scan connected devices and query HID idle/rate */
+BYTE GetDriverandReport(void) {
+    BYTE i, rcode, device = 0xFF, tmp;
+    DEV_RECORD* rec;
+    const char* const devclasses[] =
+        { " Uninitialized", " HID Keyboard", " HID Mouse", " Mass storage" };
+
+    xil_printf("Reached USB_STATE_RUNNING (0x40)\n");
+    for (i = 1; i < USB_NUMDEVICES; i++) {
+        rec = GetDevtable(i);
+        if (rec->epinfo != NULL) {
+            xil_printf("Device: %d %s\n", i, devclasses[rec->devclass]);
+            device = rec->devclass;
+        }
+    }
+
+    /* query idle rate & protocol */
+    rcode = XferGetIdle(addr, 0, hid_device.interface, 0, &tmp);
+    if (rcode) {
+        xil_printf("GetIdle Error: %02x\n", rcode);
+    } else {
+        xil_printf("Idle rate: %u\n", tmp);
+    }
+    rcode = XferGetProto(addr, 0, hid_device.interface, &tmp);
+    if (rcode) {
+        xil_printf("GetProto Error: %02x\n", rcode);
+    } else {
+        xil_printf("Protocol: %u\n", tmp);
+    }
+
+    return device;
+}
+
+/*** Main entry ***/
+int main(void) {
+    init_platform();
+
+    /* hex display GPIO init */
+    XGpio_Initialize(&Gpio_hex, XPAR_GPIO_USB_KEYCODE_DEVICE_ID);
+    XGpio_SetDataDirection(&Gpio_hex, 1, 0x0);
+    XGpio_SetDataDirection(&Gpio_hex, 2, 0x0);
+
+    xil_printf("initializing MAX3421E...\n");
+    MAX3421E_init();
+    xil_printf("initializing USB...\n");
+    USB_init();
+
+    /* one‑time PWM setup: two channels (e.g. left/right) */
+    for (int ch = 0; ch < 2; ch++) {
+        PWM_ConfigureChannel(ch, PWM_PERIOD, PWM_PERIOD/2);
+        PWM_EnableChannel(ch);
+    }
+
+    BYTE runningDebug = 0, errorFlag = 0;
+    BYTE device = 0xFF;
+
+    while (1) {
+        xil_printf(".");
+        MAX3421E_Task();
+        USB_Task();
+
+        switch (GetUsbTaskState()) {
+            case USB_STATE_RUNNING:
+                if (!runningDebug) {
+                    runningDebug = 1;
+                    device = GetDriverandReport();
+                }
+
+                /* --- HID Keyboard --- */
+                if (device == 1) {
+                    BOOT_KBD_REPORT kbdbuf;
+                    BYTE rcode = kbdPoll(&kbdbuf);
+                    if (rcode == hrNAK) break;
+                    if (rcode) {
+                        xil_printf("kbdPoll Error: %02x\n", rcode);
+                        break;
+                    }
+                    printHex(
+                      kbdbuf.keycode[0] |
+                      (kbdbuf.keycode[1]<<8) |
+                      (kbdbuf.keycode[2]<<16) |
+                      (kbdbuf.keycode[3]<<24),
+                      1
+                    );
+                }
+                /* --- HID Mouse --- */
+                else if (device == 2) {
+                    BOOT_MOUSE_REPORT m;
+                    BYTE rcode = mousePoll(&m);
+                    if (rcode == hrNAK) break;
+                    if (rcode) {
+                        xil_printf("mousePoll Error: %02x\n", rcode);
+                        break;
+                    }
+                    //xil_printf("X:%d Y:%d Btn:%x\n",
+                               (signed char)m.Xdispl,
+                               (signed char)m.Ydispl,
+                               m.button);
+                }
+                /* --- (placeholder) USB‐Audio --- */
+                else if (device == /* your audio class ID */ 4) {
+                    /*
+                     * TODO: pull one PCM sample from your isoch audio callback.
+                     * Here’s how you’d map an 8‑bit sample into PWM:
+                     *
+                     *   uint8_t sample = getNextAudioSample();
+                     *   uint32_t pulse = (PWM_PERIOD * sample) / 255;
+                     *   PWM_ConfigureChannel(0, PWM_PERIOD, pulse);
+                     *   PWM_ConfigureChannel(1, PWM_PERIOD, pulse);
+                     */
+                }
+                break;
+
+            case USB_STATE_ERROR:
+                if (!errorFlag) {
+                    errorFlag = 1;
+                    xil_printf("USB Error State\n");
+                }
+                break;
+
+            default:
+                xil_printf("USB task state: %02x\n", GetUsbTaskState());
+                if (runningDebug) {
+                    runningDebug = 0;
+                    MAX3421E_init();
+                    USB_init();
+                }
+                errorFlag = 0;
+                break;
+        }
+    }
+
+    cleanup_platform();
+    return 0;
+}

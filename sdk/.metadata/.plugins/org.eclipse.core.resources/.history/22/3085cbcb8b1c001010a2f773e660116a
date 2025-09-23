@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include "platform.h"
+#include "lw_usb/GenericMacros.h"
+#include "lw_usb/GenericTypeDefs.h"
+#include "lw_usb/MAX3421E.h"
+#include "lw_usb/USB.h"
+#include "lw_usb/usb_ch9.h"
+#include "lw_usb/transfer.h"
+#include "lw_usb/HID.h"
+#include <sleep.h>
+#include "xparameters.h"
+#include <xgpio.h>
+
+extern HID_DEVICE hid_device;
+static XGpio Gpio_hex;
+static BYTE addr = 1;
+const char* const devclasses[] = { " Uninitialized", " HID Keyboard", " HID Mouse", " Mass storage" };
+
+// ========== ONLY CHANGED THESE PWM SETTINGS ========== //
+#define PWM_BASE_ADDRESS 0x44A10000U
+uint32_t period = 100000;  // 1 kHz frequency @ 100 MHz clock
+uint32_t pulse = 50000;    // 50% duty cycle (VALID: pulse < period)
+
+void PWM_EnableChannel(uint8_t channel) {
+    Xil_Out32(PWM_BASE_ADDRESS + 16 * channel, 0x01UL);
+}
+
+void PWM_DisableChannel(uint8_t channel) {
+    Xil_Out32(PWM_BASE_ADDRESS + 16 * channel, 0x00UL);
+}
+
+void PWM_ConfigureChannel(uint8_t channel, uint32_t period, uint32_t pulse) {
+    Xil_Out32(PWM_BASE_ADDRESS + 16 * channel + 4, period);
+    Xil_Out32(PWM_BASE_ADDRESS + 16 * channel + 8, pulse);
+}
+// ========== END OF PWM CHANGES ========== //
+
+BYTE GetDriverandReport() {
+    // ... (unchanged USB/HID functions) ...
+}
+
+void printHex(u32 data, unsigned channel) {
+    XGpio_DiscreteWrite(&Gpio_hex, channel, data);
+}
+
+int main() {
+    init_platform();
+    XGpio_Initialize(&Gpio_hex, XPAR_GPIO_USB_KEYCODE_DEVICE_ID);
+    XGpio_SetDataDirection(&Gpio_hex, 1, 0x00000000);
+    XGpio_SetDataDirection(&Gpio_hex, 2, 0x00000000);
+
+    BYTE rcode;
+    BOOT_MOUSE_REPORT buf;
+    BOOT_KBD_REPORT kbdbuf;
+    BYTE runningdebugflag = 0;
+    BYTE errorflag = 0;
+    BYTE device;
+
+    MAX3421E_init();
+    USB_init();
+
+    // ========== PWM INITIALIZATION CHANGES ========== //
+    PWM_EnableChannel(0);
+    PWM_ConfigureChannel(0, period, pulse);  // Valid configuration
+    // PWM_EnableChannel(1);  // Only enable if actually needed
+    // ========== END OF CHANGES ========== //
+
+    while(1) {
+        // ========== REMOVED INVALID PWM RECONFIGURATION ========== //
+        // Original problem: Constantly reconfiguring with bad values
+        // PWM_ConfigureChannel(0, 100000, 500000);
+        // PWM_ConfigureChannel(1, 100000, 500000);
+        // sleep(5);
+
+        // Keep USB functionality intact
+        MAX3421E_Task();
+        USB_Task();
+
+        if(GetUsbTaskState() == USB_STATE_RUNNING) {
+            if(!runningdebugflag) {
+                runningdebugflag = 1;
+                device = GetDriverandReport();
+            }
+            // ... (rest of USB handling code remains unchanged) ...
+        }
+    }
+
+    cleanup_platform();
+    return 0;
+}

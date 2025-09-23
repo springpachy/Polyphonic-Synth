@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_looper_pwm_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_looper_pwm" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="282.061608 us"></ZoomEndTime>
+      <Cursor1Time time="17.620000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="197"></NameColumnWidth>
+      <ValueColumnWidth column_width="93"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="15" />
+   <wvobject fp_name="/tb_looper_pwm/live_kc0" type="array">
+      <obj_property name="ElementShortName">live_kc0[7:0]</obj_property>
+      <obj_property name="ObjectShortName">live_kc0[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/pwm" type="logic">
+      <obj_property name="ElementShortName">pwm</obj_property>
+      <obj_property name="ObjectShortName">pwm</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/u_looper/state" type="array">
+      <obj_property name="ElementShortName">state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">state[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/u_looper/write_ptr" type="array">
+      <obj_property name="ElementShortName">write_ptr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">write_ptr[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/u_looper/read_ptr" type="array">
+      <obj_property name="ElementShortName">read_ptr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">read_ptr[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/loop_kc0" type="array">
+      <obj_property name="ElementShortName">loop_kc0[7:0]</obj_property>
+      <obj_property name="ObjectShortName">loop_kc0[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/loop_kc1" type="array">
+      <obj_property name="ElementShortName">loop_kc1[7:0]</obj_property>
+      <obj_property name="ObjectShortName">loop_kc1[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/loop_kc2" type="array">
+      <obj_property name="ElementShortName">loop_kc2[7:0]</obj_property>
+      <obj_property name="ObjectShortName">loop_kc2[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/loop_kc3" type="array">
+      <obj_property name="ElementShortName">loop_kc3[7:0]</obj_property>
+      <obj_property name="ObjectShortName">loop_kc3[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/KC_HOME" type="array">
+      <obj_property name="ElementShortName">KC_HOME[7:0]</obj_property>
+      <obj_property name="ObjectShortName">KC_HOME[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/KC_END" type="array">
+      <obj_property name="ElementShortName">KC_END[7:0]</obj_property>
+      <obj_property name="ObjectShortName">KC_END[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/KC_C" type="array">
+      <obj_property name="ElementShortName">KC_C[7:0]</obj_property>
+      <obj_property name="ObjectShortName">KC_C[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/KC_E" type="array">
+      <obj_property name="ElementShortName">KC_E[7:0]</obj_property>
+      <obj_property name="ObjectShortName">KC_E[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/KC_G" type="array">
+      <obj_property name="ElementShortName">KC_G[7:0]</obj_property>
+      <obj_property name="ObjectShortName">KC_G[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_looper_pwm/u_pwm/mix" type="array">
+      <obj_property name="ElementShortName">mix[4:0]</obj_property>
+      <obj_property name="ObjectShortName">mix[4:0]</obj_property>
+   </wvobject>
+</wave_config>
