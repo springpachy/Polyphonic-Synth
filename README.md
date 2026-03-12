@@ -21,16 +21,16 @@ A polyphonic digital synthesizer implemented on the Urbana FPGA board. Takes USB
 flowchart TD
     USB[USB Keyboard] --> MB[MicroBlaze Block]
 
-    MB -->|Keycodes/octaves| PWM[Sound Generation\nPWM Module]
-    MB -->|Keycodes/octaves| REG[Registers\nkeycode+octave+timing snapshots]
+    MB -->|Keycodes/octaves| PWM[Sound Generation PWM Module]
+    MB -->|Keycodes/octaves| REG[Registers: keycode + octave + timing snapshots]
 
-    REG --> KC2MEM[Keycode → Memory\nConversion Logic]
-    KC2MEM --> LOOP[Looping Logic +\nMemory → Keycode/Octave]
-    LOOP -->|Simulated keycodes/octaves\nfrom looper registers| PWM
+    REG --> KC2MEM[Keycode to Memory Conversion Logic]
+    KC2MEM --> LOOP[Looping Logic + Memory to Keycode/Octave]
+    LOOP -->|Simulated keycodes/octaves from looper| PWM
 
-    LUTROM[LUTROM of\nMIDI-Converted Songs] --> MUX[MUX for Song\nSelection + Playback Logic]
-    MUX --> MEM2KC[Memory → Keycode/Octave\nConversion Logic]
-    MEM2KC -->|Simulated keycodes/octaves\nfrom ROM| PWM
+    LUTROM[LUTROM of MIDI-Converted Songs] --> MUX[MUX for Song Selection + Playback Logic]
+    MUX --> MEM2KC[Memory to Keycode/Octave Conversion Logic]
+    MEM2KC -->|Simulated keycodes/octaves from ROM| PWM
 
     PWM --> SPK[Speaker / Headphones]
 ```
