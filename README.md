@@ -3,6 +3,8 @@
 
 A polyphonic digital synthesizer implemented on the Urbana FPGA board. Takes USB keyboard input to play musical notes via 16-voice PWM audio through the board's 3.5mm audio jack, with an on-screen HDMI piano keyboard GUI, a loop recorder, and pre-programmed MIDI song playback.
 
+🎹 **[Demo Video](https://youtu.be/xuvKj7oR4cw)**
+
 ---
 
 ## Features
